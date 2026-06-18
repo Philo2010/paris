@@ -1,0 +1,13 @@
+[package]
+name = "paris"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+arrayvec = "0.7.6"
+ash = {version = "0.38.0", features = ["linked"] }
+ash-window = "0.13.0"
+log = "0.4.32"
+raw-window-handle = "0.6.2"
+simplelog = "0.12.2"
+winit = "0.30.13"
