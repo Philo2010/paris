@@ -102,6 +102,7 @@ pub unsafe fn new(entry: &ash::Entry, display_handle: &RawDisplayHandle) -> Resu
         _marker: std::marker::PhantomData,
     };
 
+
     //this is a truely unsafe call, we need to make sure that everything is hunky dorry before closing this one out
     let instance = unsafe { entry.create_instance(&create_info, None)? };
     

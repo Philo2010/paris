@@ -1,3 +1,5 @@
+use std::ffi::FromBytesUntilNulError;
+
 use ash::vk;
 
 #[derive(Debug)]
@@ -6,7 +8,8 @@ pub enum RDError {
     VulkanError(vk::Result),
     // signals the caller to fall back
     VulkanMissedRequrement(&'static str),
-    // etc
+    FailToParseStr(FromBytesUntilNulError),
+    NoVaildDeviceFound,
 }
 
 impl From<vk::Result> for RDError {

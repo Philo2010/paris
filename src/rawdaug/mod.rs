@@ -10,17 +10,9 @@ use crate::rawdaug::error::RDError;
 
 pub mod instance;
 pub mod error;
+pub mod vulkan_callback;
+pub mod physical_device;
 
-
-macro_rules! rd_error {
-    ($($arg:tt)*) => { log::error!(target: "RD", $($arg)*) }
-}
-macro_rules! rd_info {
-    ($($arg:tt)*) => { log::info!(target: "RD", $($arg)*) }
-}
-macro_rules! rd_debug {
-    ($($arg:tt)*) => { log::debug!(target: "RD", $($arg)*) }
-}
 
 
 pub struct RDObject {
@@ -30,7 +22,7 @@ pub struct RDObject {
 
 impl RDObject {
     pub fn new(display_handle: &RawDisplayHandle) -> Result<RDObject, RDError>  {
-        rd_info!("Creating rawdaug object!");
+        log::info!("Creating rawdaug object!");
         let entry = Entry::linked();
 
         // this unsafe is fine as we will destory the object properely at the end with drop
@@ -44,7 +36,7 @@ impl RDObject {
 impl Drop for RDObject {
     fn drop(&mut self) {
         //thanks to rust's type system, we know its has lived untill this point
-        rd_info!("destroying rawdaug object...");
+        log::info!("destroying rawdaug object...");
         unsafe { self.instance.destroy_instance(None) };
     }
 }
