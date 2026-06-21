@@ -1,17 +1,15 @@
-//looks at all of our devices and desides which is best for use
-
 use std::{collections::BTreeMap, ffi::CStr};
 
-use arrayvec::ArrayVec;
-use ash::vk::{self, PhysicalDeviceType};
+use ash::{prelude::VkResult, vk::{self, PhysicalDeviceType}};
 
-use crate::rawdaug::{self, error::RDError};
+use crate::rawdaug::{error::{self, RDError}};
 
+// all of the code to pick and load a physical device
 const neededD_EXT: [&CStr; 1] = [
     c"VK_KHR_swapchain"
 ];
 
-pub fn pick_from_list(list: Vec<vk::PhysicalDevice>, instance: &ash::Instance) -> Result<vk::PhysicalDevice, rawdaug::error::RDError> {   
+pub fn pick_from_list(list: Vec<vk::PhysicalDevice>, instance: &ash::Instance) -> Result<vk::PhysicalDevice, error::RDError> {   
     //BTreeMap colletions are never an issue because my playerbase it too broke to have two good quatly gpus
     let mut map: BTreeMap<u32, vk::PhysicalDevice> = BTreeMap::new();
 
@@ -75,4 +73,11 @@ pub fn pick_from_list(list: Vec<vk::PhysicalDevice>, instance: &ash::Instance) -
             Err(RDError::NoVaildDeviceFound)
         },
     }
+}
+
+
+pub fn pick_device(instance: ash::Instance) -> Result<vk::PhysicalDevice, RDError> {
+    //safe as it only enumatres, we dont own shit   
+    let devices = unsafe { instance.enumerate_physical_devices()? };
+    pick_from_list(devices, &instance)
 }
