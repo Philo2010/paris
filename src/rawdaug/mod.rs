@@ -12,6 +12,7 @@ pub mod instance;
 pub mod error;
 pub mod vulkan_callback;
 pub mod physical_device;
+pub mod logical_device;
 
 
 
