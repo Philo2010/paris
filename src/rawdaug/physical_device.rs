@@ -5,7 +5,7 @@ use ash::{prelude::VkResult, vk::{self, PhysicalDeviceType}};
 use crate::rawdaug::{error::{self, RDError}};
 
 // all of the code to pick and load a physical device
-const neededD_EXT: [&CStr; 1] = [
+pub const neededD_EXT: [&CStr; 1] = [
     c"VK_KHR_swapchain"
 ];
 
@@ -76,8 +76,8 @@ pub fn pick_from_list(list: Vec<vk::PhysicalDevice>, instance: &ash::Instance) -
 }
 
 
-pub fn pick_device(instance: ash::Instance) -> Result<vk::PhysicalDevice, RDError> {
+pub fn pick_device(instance: &ash::Instance) -> Result<vk::PhysicalDevice, RDError> {
     //safe as it only enumatres, we dont own shit   
     let devices = unsafe { instance.enumerate_physical_devices()? };
-    pick_from_list(devices, &instance)
+    pick_from_list(devices, instance)
 }
