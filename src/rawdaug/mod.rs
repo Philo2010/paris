@@ -49,7 +49,7 @@ impl Drop for RDObject {
     fn drop(&mut self) {
         //thanks to rust's type system, we know its has lived untill this point
         log::info!("destroying rawdaug object...");
-        unsafe  {self.logical_device.destroy_device(None);}
+        unsafe {self.logical_device.destroy_device(None);}
         unsafe { self.instance.destroy_instance(None) };
     }
 }
