@@ -18,11 +18,19 @@ macro_rules! cstr_ptrs {
     }};
 }
 
-pub unsafe fn create_logical_device(instance: &ash::Instance, p_device: &vk::PhysicalDevice) -> Result<(u32, ash::Device), RDError> {
-    let graphics_queue_index = instance
-        .get_physical_device_queue_family_properties(*p_device) //UNSAFE CALL IS FINE BECAUSE NO MEMEORY LEAKS!
+pub unsafe fn create_logical_device(instance: &ash::Instance, p_device: &vk::PhysicalDevice, surface: &vk::SurfaceKHR, surface_loader: &ash::khr::surface::Instance) -> Result<(u32, ash::Device), RDError> {
+    let queue_families = instance.get_physical_device_queue_family_properties(*p_device);
+    
+    let graphics_queue_index = queue_families
         .iter()
-        .position(|q| q.queue_flags.contains(QueueFlags::GRAPHICS))
+        .enumerate()
+        .position(|(index, q)| {
+            let has_graphics = q.queue_flags.contains(QueueFlags::GRAPHICS);
+            let has_present = surface_loader
+                .get_physical_device_surface_support(*p_device, index as u32, *surface)
+                .unwrap_or(false);
+            has_graphics && has_present
+        })
         .ok_or(RDError::DeviceHadNoGraphicsQueues)? as u32;
 
     let queue_priority = 1.0f32;

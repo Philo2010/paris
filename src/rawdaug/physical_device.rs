@@ -9,7 +9,7 @@ pub const neededD_EXT: [&CStr; 1] = [
     c"VK_KHR_swapchain"
 ];
 
-pub fn pick_from_list(list: Vec<vk::PhysicalDevice>, instance: &ash::Instance) -> Result<vk::PhysicalDevice, error::RDError> {   
+pub fn pick_from_list(list: Vec<vk::PhysicalDevice>, instance: &ash::Instance, surface_loader: &ash::khr::surface::Instance, surface: vk::SurfaceKHR) -> Result<vk::PhysicalDevice, error::RDError> {   
     //BTreeMap colletions are never an issue because my playerbase it too broke to have two good quatly gpus
     let mut map: BTreeMap<u32, vk::PhysicalDevice> = BTreeMap::new();
 
@@ -36,8 +36,12 @@ pub fn pick_from_list(list: Vec<vk::PhysicalDevice>, instance: &ash::Instance) -
         //safe as we know insatance and gpu are vaild (unless the gpu driver is broken in that cause we have bigger problems)
         let haved_queued_famlies = unsafe { instance.get_physical_device_queue_family_properties(gpu) };
         
-        let has_graphics = haved_queued_famlies.iter().any(|x| {
-            x.queue_flags.contains(vk::QueueFlags::GRAPHICS)
+
+        let has_graphics = haved_queued_famlies.iter().enumerate().any(|(index, x)| {
+            let graphics = x.queue_flags.contains(vk::QueueFlags::GRAPHICS);
+            //safe as no acloc
+            let surface_support = unsafe { surface_loader.get_physical_device_surface_support(gpu, index as u32, surface).unwrap_or(false) };
+            graphics && surface_support
         });
         let supports_required_features =
             vk11_features.shader_draw_parameters == vk::TRUE &&
@@ -76,8 +80,8 @@ pub fn pick_from_list(list: Vec<vk::PhysicalDevice>, instance: &ash::Instance) -
 }
 
 
-pub fn pick_device(instance: &ash::Instance) -> Result<vk::PhysicalDevice, RDError> {
+pub fn pick_device(instance: &ash::Instance,  surface_loader: &ash::khr::surface::Instance, surface: vk::SurfaceKHR) -> Result<vk::PhysicalDevice, RDError> {
     //safe as it only enumatres, we dont own shit   
     let devices = unsafe { instance.enumerate_physical_devices()? };
-    pick_from_list(devices, instance)
+    pick_from_list(devices, instance, surface_loader, surface)
 }

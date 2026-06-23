@@ -8,7 +8,7 @@ use winit::{
     event_loop::{ActiveEventLoop, EventLoop},
     window::{Window, WindowId},
 };
-use raw_window_handle::HasDisplayHandle;
+use raw_window_handle::{HasDisplayHandle, HasWindowHandle};
 
 #[derive(Default)]
 struct App {
@@ -23,7 +23,8 @@ impl ApplicationHandler for App {
             .unwrap();
 
         let display_handle = window.display_handle().unwrap();
-        self.rd = Some(rawdaug::RDObject::new(&display_handle.as_raw()).expect("failed"));
+        let window_handle = window.window_handle().unwrap();
+        self.rd = Some(rawdaug::RDObject::new(&display_handle.as_raw(), &window_handle.as_raw()).expect("failed"));
         self.window = Some(window);
     }
 
