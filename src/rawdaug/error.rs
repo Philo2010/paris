@@ -10,7 +10,8 @@ pub enum RDError {
     VulkanMissedRequrement(&'static str),
     FailToParseStr(FromBytesUntilNulError),
     NoVaildDeviceFound,
-    DeviceHadNoGraphicsQueues
+    DeviceHadNoGraphicsQueues,
+    DeviceHadNoFormats,
 }
 
 impl From<vk::Result> for RDError {
