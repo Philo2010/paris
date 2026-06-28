@@ -24,7 +24,7 @@ impl ApplicationHandler for App {
 
         let display_handle = window.display_handle().unwrap();
         let window_handle = window.window_handle().unwrap();
-        self.rd = Some(rawdaug::RDObject::new(&display_handle.as_raw(), &window_handle.as_raw()).expect("failed"));
+        self.rd = Some(rawdaug::RDObject::new(&display_handle.as_raw(), &window_handle.as_raw(), &window).expect("failed"));
         self.window = Some(window);
     }
 
