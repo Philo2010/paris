@@ -14,12 +14,14 @@ pub mod vulkan_callback;
 pub mod physical_device;
 pub mod logical_device;
 pub mod swapchain;
+pub mod image_view;
 
 
 pub struct RDObject {
     physical_device: vk::PhysicalDevice,
     graphics_index: u32,
     swapchain_loader: ash::khr::swapchain::Device,
+    image_views: Vec<vk::ImageView>,
     images: Vec<vk::Image>,
     swapchain: vk::SwapchainKHR,
     swapchain_format: SurfaceFormatKHR,
@@ -55,9 +57,10 @@ impl RDObject {
         let (swapchain, swapchain_format, swapchain_extent) = unsafe { swapchain::new(physical_device, &surface_loader, surface, &swapchain_loader, &window)? };
         //these are created by the swapchain and as such will be destored naturaly
         let images = unsafe { swapchain_loader.get_swapchain_images(swapchain) }?;
-
+        //image views (need to be cleaned up)
+        let image_views = unsafe { image_view::new(&images, swapchain_format.format, &logical_device)? };
         
-        Ok(RDObject { entry, images, swapchain, swapchain_format, swapchain_extent, instance, surface_loader, swapchain_loader, surface, physical_device, graphics_index, logical_device, graphics_queue })
+        Ok(RDObject { entry, images, image_views, swapchain, swapchain_format, swapchain_extent, instance, surface_loader, swapchain_loader, surface, physical_device, graphics_index, logical_device, graphics_queue })
     }
 }
 
@@ -66,6 +69,7 @@ impl Drop for RDObject {
     fn drop(&mut self) {
         //thanks to rust's type system, we know its has lived untill this point
         log::info!("destroying rawdaug object...");
+        unsafe { image_view::clean(&self.image_views, &self.logical_device);}
         unsafe { self.swapchain_loader.destroy_swapchain(self.swapchain, None);}
         unsafe { self.logical_device.destroy_device(None);}
         unsafe { self.surface_loader.destroy_surface(self.surface, None);}
