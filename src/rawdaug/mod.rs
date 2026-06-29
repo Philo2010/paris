@@ -15,6 +15,7 @@ pub mod physical_device;
 pub mod logical_device;
 pub mod swapchain;
 pub mod image_view;
+pub mod pipeline;
 
 
 pub struct RDObject {
